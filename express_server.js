@@ -10,6 +10,7 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com",
 };
 
+// this code generates a random string up to 6 characters long
 const generateRandomString = function() {
   return Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 6);
 };
@@ -17,6 +18,7 @@ const generateRandomString = function() {
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({ extended: true }));
 
+// this code '/' requests the homepage
 app.get("/", (req, res) => {
   res.send("Hello!\n");
 });
@@ -33,10 +35,10 @@ app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
 
-// app.get("/u/:shortURL", (req, res) => {
-//   const longURL = 
-//   res.redirect(longURL);
-// });
+app.get("/u/:shortURL", (req, res) => {
+  let longURL = urlDatabase[req.params.shortURL];
+  res.redirect(longURL);
+});
 
 app.get("/urls", (req, res) => {
   const templateVars = { urls: urlDatabase };
@@ -57,10 +59,10 @@ app.get("/urls/:shortURL", (req, res) => {
 
 app.post("/urls", (req, res) => {
   console.log(req.body); // Log the POST request body to the console
-
+  // this is the section that assigns a random string to shortURL, then saves the short/long key pairs to the database
   let shortURL = generateRandomString();
   let longURL = req.body.longURL;
   urlDatabase[shortURL] = longURL;
 
-  res.redirect(`/urls/${shortURL}`); // Respond with a randomly generated string, using the code we included above
+  res.redirect(`/urls/${shortURL}`);
 });
