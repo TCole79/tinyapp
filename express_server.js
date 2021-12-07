@@ -57,6 +57,12 @@ app.get("/urls/:shortURL", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
+app.post("/urls/:shortURL/delete", (req, res) => {
+  const idToDelete = req.params.shortURL;
+  delete urlDatabase[idToDelete];
+  res.redirect("/urls");
+});
+
 app.post("/urls", (req, res) => {
   console.log(req.body); // Log the POST request body to the console
   // this is the section that assigns a random string to shortURL, then saves the short/long key pairs to the database
