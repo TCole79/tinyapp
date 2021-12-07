@@ -33,6 +33,11 @@ app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
 
+// app.get("/u/:shortURL", (req, res) => {
+//   const longURL = 
+//   res.redirect(longURL);
+// });
+
 app.get("/urls", (req, res) => {
   const templateVars = { urls: urlDatabase };
   res.render("urls_index", templateVars);
@@ -52,5 +57,10 @@ app.get("/urls/:shortURL", (req, res) => {
 
 app.post("/urls", (req, res) => {
   console.log(req.body); // Log the POST request body to the console
-  res.send(generateRandomString()); // Respond with a randomly generated string, using the code we included above
+
+  let shortURL = generateRandomString();
+  let longURL = req.body.longURL;
+  urlDatabase[shortURL] = longURL;
+
+  res.redirect(`/urls/${shortURL}`); // Respond with a randomly generated string, using the code we included above
 });
