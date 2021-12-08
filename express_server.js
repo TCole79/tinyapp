@@ -21,13 +21,11 @@ app.listen(PORT, () => {
 });
 
 
-
 ////---- URL DATABASE ----////
 const urlDatabase = {
   b2xVn2: "http://lighthouselabs.ca",
   "9sm5xK": "http://www.google.com",
 };
-
 
 
 ////---- GENERATE RANDOM STRING ----////
@@ -38,6 +36,8 @@ const generateRandomString = function() {
     .replace(/[^a-z]+/g, "")
     .substr(0, 6);
 };
+
+////---- ROUTES ----////
 
 
 ////---- CREATE USERS OBJECT ----////
@@ -54,55 +54,56 @@ const users = {
   },
 };
 // class example below
-// const findUserByEmail = (email) => {
-//   for (const userID in users) {
-//     const user = users[userID];
-//     if (user.email === email) {
-//       return user;
-//     }
-//   }
-//   return null;
-// };
+const findUserByEmail = (email) => {
+  for (const userID in users) {
+    const user = users[userID];
+    if (user.email === email) {
+      return user;
+    }
+  }
+  return null;
+};
 
 
-////---- ROUTES ----////
 
 
 ////---- NEW USER REGISTRATION HANDLER ----////
 
-
-app.post("/register"), (req, res) => {
-
-};
-
 app.get("/register", (req, res) => {
-  // const email = req.body.email;
-  // const password = req.body.password;
-
-  // if (!email || !password) {
-  //   return res.status(400).send("email and password cannot be blank");
-  // }
-
-  // const user = findUserByEmail(email);
-  // if (user) {
-  //   return res.status(400).send("User already exists with that email.");
-  // }
-
-  //const id = generateRandomString();
-
-  // users[id] = {
-  //   id: id,
-  //   email: email,
-  //   password: password
-  // };
-
-  // tinyapp will have us login them in immediately on registration
-
   // const userLoginID = something ["userLoginID"]?
   const templateVars = { urls: urlDatabase, username: req.cookies["username"] };
   res.render("register", templateVars);
   //res.redirect("/urls");
 });
+
+
+app.post("/register"), (req, res) => {
+  const email = req.body.email; // is this correct?
+  const password = req.body.password; // is this correct?
+
+  if (!email || !password) {
+    return res.status(400).send("Email and password cannot be blank.");
+  }
+
+  const user = findUserByEmail(email);
+  if (user) {
+    return res.status(400).send("User already exists with that email.");
+  }
+
+  const id = generateRandomString();
+
+  users[id] = {
+    id: id,
+    email: email,
+    password: password
+  };
+
+  // tinyapp will have us login them in immediately on registration
+  // After adding the user, set a user_id cookie containing the user's newly generated ID.
+
+  res.redirect("/urls");
+};
+
 
 
 ////---- USER LOGIN ----////
@@ -144,7 +145,6 @@ app.get("/register", (req, res) => {
 // };
 
 // app.get("/login"), (req, res) => {
-
 // };
 
 
