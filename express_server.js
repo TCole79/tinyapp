@@ -52,9 +52,11 @@ app.get("/u/:shortURL", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  const templateVars = { urls: urlDatabase, username: req.cookies["username"] }; // added this in order to render templates properly.
+  const templateVars = { urls: urlDatabase,
+    username: req.cookies["username"], }; // added this in order to render templates properly.
   res.render("urls_index", templateVars);
 });
+
 
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
@@ -82,6 +84,16 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   res.redirect("/urls");
 });
 
+app.post("/urls", (req, res) => {
+  console.log(req.body); // Log the POST request body to the console
+  // this is the section that assigns a random string to shortURL, then saves the short/long key pairs to the database
+  let shortURL = generateRandomString();
+  let longURL = req.body.longURL;
+  urlDatabase[shortURL] = longURL;
+  
+  res.redirect(`/urls/${shortURL}`);
+});
+
 ////---- COOKIES ----////
 app.post("/login", (req, res) => {
   let username = req.body.username;
@@ -90,12 +102,8 @@ app.post("/login", (req, res) => {
   res.redirect("/urls");
 });
 
-app.post("/urls", (req, res) => {
-  console.log(req.body); // Log the POST request body to the console
-  // this is the section that assigns a random string to shortURL, then saves the short/long key pairs to the database
-  let shortURL = generateRandomString();
-  let longURL = req.body.longURL;
-  urlDatabase[shortURL] = longURL;
-
-  res.redirect(`/urls/${shortURL}`);
+////---- LOGOUT ----////
+app.post("/logout", (req, res) => {
+  res.clearCookie('username');
+  res.redirect("/urls");
 });
