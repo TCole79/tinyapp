@@ -21,7 +21,12 @@
           Short URL: <a href="/u/<%= shortURL %>"><%= shortURL %></a>
         </p>
       </div>
-      <div class="card-footer text-muted"></div>
+      <div class="card-footer text-muted">
+        <form method="POST" action="/urls/<%= shortURL %>">
+          <input name='EditField' type='text'/>
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+      </div>
     </div>
     <!-- Bootstrap JS -->
     <script
