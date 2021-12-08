@@ -7,19 +7,16 @@ const bodyParser = require("body-parser");
 const { reset } = require("nodemon"); // is this being used as its dull?
 // morgan? const morgan = require('morgan');
 
-
 ////---- MIDDLEWARE ----////
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 // morgan? app.set(morgan('dev'));
 
-
 ////---- LISTEN ----////
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
-
 
 ////---- URL DATABASE ----////
 const urlDatabase = {
@@ -27,10 +24,9 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com",
 };
 
-
 ////---- GENERATE RANDOM STRING ----////
 // this code generates a random string up to 6 characters long
-const generateRandomString = function() {
+const generateRandomString = function () {
   return Math.random()
     .toString(36)
     .replace(/[^a-z]+/g, "")
@@ -38,7 +34,6 @@ const generateRandomString = function() {
 };
 
 ////---- ROUTES ----////
-
 
 ////---- CREATE USERS OBJECT ----////
 const users = {
@@ -64,11 +59,7 @@ const findUserByEmail = (email) => {
   return null;
 };
 
-
-
-
 ////---- NEW USER REGISTRATION HANDLER ----////
-
 app.get("/register", (req, res) => {
   // const userLoginID = something ["userLoginID"]?
   const templateVars = { urls: urlDatabase, username: req.cookies["username"] };
@@ -76,8 +67,7 @@ app.get("/register", (req, res) => {
   //res.redirect("/urls");
 });
 
-
-app.post("/register"), (req, res) => {
+app.post("/register", (req, res) => {
   const email = req.body.email; // is this correct?
   const password = req.body.password; // is this correct?
 
@@ -95,16 +85,12 @@ app.post("/register"), (req, res) => {
   users[id] = {
     id: id,
     email: email,
-    password: password
+    password: password,
   };
 
-  // tinyapp will have us login them in immediately on registration
-  // After adding the user, set a user_id cookie containing the user's newly generated ID.
-
+  res.cookie("userId", id);
   res.redirect("/urls");
-};
-
-
+});
 
 ////---- USER LOGIN ----////
 // example from the lecture
@@ -147,7 +133,6 @@ app.post("/register"), (req, res) => {
 // app.get("/login"), (req, res) => {
 // };
 
-
 // this code '/' requests the homepage
 app.get("/", (req, res) => {
   res.send("Hello!\n");
@@ -167,7 +152,10 @@ app.get("/u/:shortURL", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  const templateVars = { urls: urlDatabase, username: req.cookies["username"] }; // added this in order to render templates properly.
+  const templateVars = {
+    urls: urlDatabase,
+    username: req.cookies["username"],
+  }; // added this in order to render templates properly.
   res.render("urls_index", templateVars);
 });
 
@@ -180,10 +168,14 @@ app.get("/urls/:shortURL", (req, res) => {
   const templateVars = {
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL],
-    username: req.cookies["username"], // added this in order to render templates properly.
+    //username: req.cookies["username"], commented this out to see what breaks
   };
-  console.log("test 2 ", templateVars);
   res.render("urls_show", templateVars);
+});
+
+app.post("/urls/:shortURL", (req, res) => {
+  urlDatabase[req.params.shortURL] = req.body.EditField;
+  res.redirect("/urls");
 });
 
 ////---- DELETE URL ----////
