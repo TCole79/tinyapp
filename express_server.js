@@ -1,31 +1,44 @@
+////---- REQUIRED ----////
 const express = require("express");
 const app = express();
 const PORT = 8080;
 
+const bodyParser = require("body-parser");
+app.use(bodyParser.urlencoded({ extended: true }));
+
+
+////---- LISTEN ----////
+app.listen(PORT, () => {
+  console.log(`Example app listening on port ${PORT}!`);
+});
+
+
+////---- MIDDLEWARE ----////
 app.set("view engine", "ejs");
 
 
+////---- URL DATABASE ----////
 const urlDatabase = {
   b2xVn2: "http://lighthouselabs.ca",
   "9sm5xK": "http://www.google.com",
 };
+
+
+////---- ROUTES ----////
+
 
 // this code generates a random string up to 6 characters long
 const generateRandomString = function() {
   return Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 6);
 };
 
-const bodyParser = require("body-parser");
-app.use(bodyParser.urlencoded({ extended: true }));
 
 // this code '/' requests the homepage
 app.get("/", (req, res) => {
   res.send("Hello!\n");
 });
 
-app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}!`);
-});
+
 
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
@@ -62,10 +75,20 @@ app.post("/urls/:id", (req,res) => {
   res.redirect('/urls');
 });
 
+
+////---- DELETE URL ----////
 app.post("/urls/:shortURL/delete", (req, res) => {
   const idToDelete = req.params.shortURL;
   delete urlDatabase[idToDelete];
   res.redirect("/urls");
+});
+
+
+app.post("/login", (req,res) => {
+  let username = req.body.username;
+  res.cookie('username', username);
+  console.log(req.body);
+  res.redirect('/urls');
 });
 
 app.post("/urls", (req, res) => {
