@@ -62,7 +62,6 @@ const findUserByEmail = (email) => {
 
 ////---- NEW USER REGISTRATION HANDLER ----////
 app.get("/register", (req, res) => {
-
   const templateVars = {
     urls: urlDatabase,
     user: users[req.cookies["user_id"]],
@@ -164,7 +163,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 app.post("/login", (req, res) => {
   let email = req.body.email;
   let password = req.body.password;
-  let userEmail = findUserByEmail(users, email); // is this correct? it users the helper function from earlier
+  //let userEmail = findUserByEmail(users, email); // is this correct? it users the helper function from earlier
 
   if (!email || !password) {
     return res.status(403).send("Email and password cannot be blank.");
