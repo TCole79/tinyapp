@@ -48,7 +48,7 @@ const users = {
     password: "4321",
   },
 };
-// class example below
+
 const findUserByEmail = (email) => {
   for (const userID in users) {
     const user = users[userID];
@@ -134,7 +134,6 @@ app.get("/urls", (req, res) => {
     urls: urlDatabase,
     user: users[req.cookies["user_id"]], // changed 'user' from username
   };
-  console.log(users);
   console.log(users[req.cookies["user_id"]]);
   res.render("urls_index", templateVars);
 });
@@ -161,53 +160,34 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 });
 
 
-////---- COOKIES ----////
+////---- USER LOGIN HANDLER----////
 app.post("/login", (req, res) => {
-  //let username = req.body.username; // refactor by checking if user exists in list of users. Set cookie to user_ID
-  res.cookie("user_id", req.body.user_id);
+  const email = req.body.email;
+  const password = req.body.password;
+
+  if (!email || !password) {
+    return res.status(400).send("email and password cannot be blank");
+  }
+
+  const user = findUserByEmail(email);
+
+  if (!user) {
+    return res.status(400).send("A user with that email does not exist.");
+  }
+  if (user.password !== password) {
+    return res.status(400).send("Password does not match.");
+  }
+  res.cookie('user_id', user.id);
   res.redirect("/urls");
 });
 
-////---- USER LOGIN ----////
-// example from the lecture
-// app.post("/login"), (req, res) => {
-//   const email = req.body.email;
-//   const password = req.body.password;
+app.get('/login', (req, res) => {
+  const templateVars = {
+    user: users[req.cookies["user_id"]],
+  };
+  res.render('login', templateVars);
+});
 
-//   if (!email || !password) {
-//     return res.status(400).send("email and password cannot be blank");
-//   }
-
-//   const user = findUserByEmail(email);
-
-//   if (!user) {
-//     return res.status(400).send("A user with that email does not exist.");
-//   }
-//   if (user.password !== password) {
-//     return res.status(400).send("Password does not match.");
-//   }
-
-//   res.cookie('user_id', user.id); // change this to reflect my example
-//   res.redirect('/secrets');
-
-//   app.get('/secrets', (req, res) => {
-//     const userId = req.cookies.user_ID; // change this user bit to reflect mine
-
-//     if (!userID) {
-//       return res.status(400).send("You are not authorized to be here."); // change user bit
-//     }
-
-//     const user = users[userId]; // this should match the ejs file in croc code
-//     const templateVars = {
-//       user
-//     }
-
-//     //if (!user)
-//   });
-// };
-
-// app.get("/login"), (req, res) => {
-// };
 
 ////---- USER LOGOUT ----////
 app.post("/logout", (req, res) => {
