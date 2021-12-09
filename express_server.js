@@ -49,6 +49,7 @@ const users = {
   },
 };
 
+////---- HELPER FUNCTIONS ----////
 const findUserByEmail = (email) => {
   for (const userID in users) {
     const user = users[userID];
@@ -116,7 +117,7 @@ app.get("/u/:shortURL", (req, res) => {
 app.get("/urls/new", (req, res) => {
   const templateVars = {
     urls: urlDatabase,
-    user: users[req.cookies["user_id"]] }; // changed 'user' from username
+    user: users[req.cookies["user_id"]] };
   res.render("urls_new", templateVars);
 });
 
@@ -124,7 +125,7 @@ app.get("/urls/:shortURL", (req, res) => {
   const templateVars = {
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL],
-    user: users[req.cookies["user_id"]], // changed 'user' from username
+    user: users[req.cookies["user_id"]],
   };
   res.render("urls_show", templateVars);
 });
@@ -132,9 +133,8 @@ app.get("/urls/:shortURL", (req, res) => {
 app.get("/urls", (req, res) => {
   const templateVars = {
     urls: urlDatabase,
-    user: users[req.cookies["user_id"]], // changed 'user' from username
+    user: users[req.cookies["user_id"]],
   };
-  console.log(users[req.cookies["user_id"]]);
   res.render("urls_index", templateVars);
 });
 
@@ -162,20 +162,21 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 
 ////---- USER LOGIN HANDLER----////
 app.post("/login", (req, res) => {
-  const email = req.body.email;
-  const password = req.body.password;
+  let email = req.body.email;
+  let password = req.body.password;
+  let userEmail = findUserByEmail(users, email); // is this correct? it users the helper function from earlier
 
   if (!email || !password) {
-    return res.status(400).send("email and password cannot be blank");
+    return res.status(403).send("Email and password cannot be blank.");
   }
 
   const user = findUserByEmail(email);
 
   if (!user) {
-    return res.status(400).send("A user with that email does not exist.");
+    return res.status(403).send("A user with that email does not exist.");
   }
   if (user.password !== password) {
-    return res.status(400).send("Password does not match.");
+    return res.status(403).send("User email or password does not match.");
   }
   res.cookie('user_id', user.id);
   res.redirect("/urls");
