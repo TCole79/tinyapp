@@ -5,8 +5,8 @@ const PORT = 8080;
 const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
 const { reset } = require("nodemon"); // is this being used as its dull?
-//const cookieSession = require("cookie-session"); // is this being used as its dull?
-//const bcrypt = require("bcryptjs"); // is this being used as its dull?
+const cookieSession = require("cookie-session"); // is this being used as its dull?
+const bcrypt = require("bcryptjs"); // is this being used as its dull?
 const {
   generateRandomString,
   findUserByEmail,
@@ -40,16 +40,7 @@ const urlDatabase = {
     longURL: "https://www.google.ca",
     userID: "aJ48lW"
   },
-  testNew: {
-    longURL: "https://www.google.ca",
-    userID: "aJ48lW"
-  }
 };
-// OLD VERSION
-// const urlDatabase = {
-//   b2xVn2: "http://lighthouselabs.ca",
-//   "9sm5xK": "http://www.google.com",
-// };
 
 
 ////---- ROUTES ----////
@@ -61,12 +52,12 @@ const users = {
   "testUser1": {
     id: "testUser1",
     email: "user1@example.com",
-    password: "1234",
+    password: "$2a$10$YzUcDniy0G51xW0Uq6imMerjC2rfouxsWsgEa0SQiqHXWO5A78BNO",
   },
   "testUser2": {
     id: "testUser2",
     email: "user2@example.com",
-    password: "1234",
+    password: "$2a$10$YzUcDniy0G51xW0Uq6imMerjC2rfouxsWsgEa0SQiqHXWO5A78BNO",
   },
 };
 
@@ -92,9 +83,9 @@ app.get("/register", (req, res) => {
 // create helper function for register below? - see createUser example in lecture notes
 app.post("/register", (req, res) => {
   const email = req.body.email;
-  const password = req.body.password;
+  const hashedPassword = bcrypt.hashSync(req.body.password, 10); // added the bcrypt in
 
-  if (!email || !password) {
+  if (!email || !hashedPassword) {
     return res.status(403).send("Email and password cannot be blank.");
   }
 
@@ -108,7 +99,7 @@ app.post("/register", (req, res) => {
   users[id] = {
     id: id,
     email: email,
-    password: password
+    password: hashedPassword
     //password: bcrypt.hashsync(password, salt), // this code for adding the encryption
   };
 
@@ -314,7 +305,8 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 
 app.post("/login", (req, res) => {
   let email = req.body.email;
-  let password = req.body.password;
+  let password = (req.body.password); // changed this
+  console.log('test users ', users);
   //let userEmail = findUserByEmail(users, email); // is this correct? it users the helper function from earlier
 
   if (!email || !password) {
@@ -322,11 +314,11 @@ app.post("/login", (req, res) => {
   }
 
   const user = findUserByEmail(users, email);
-
+  console.log('test user ', user);
   if (!user) {
     return res.status(403).send("A user with that email does not exist.");
   }
-  if (user.password !== password) {
+  if (!bcrypt.compareSync(password, user.password)) {
     return res.status(403).send("User email or password does not match.");
   }
   res.cookie('user_id', user.id);
