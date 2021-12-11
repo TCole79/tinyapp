@@ -280,7 +280,7 @@ app.post("/login", (req, res) => {
 
 ////---- USER LOGOUT START ----////
 app.post("/logout", (req, res) => {
-  req.session.user_id = null;
+  req.session = null;
   res.redirect("/urls");
 });
 ////---- USER LOGOUT END ----////
