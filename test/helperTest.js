@@ -21,7 +21,6 @@ describe("findUserByEmail", () => {
     const user = findUserByEmail("user@example.com", testUsers);
     const expectedOutput = "userRandomID";
     assert.equal(user.id, expectedOutput);
-    //assert.isTrue(user.id === expectedOutput); // this also works as a check condition
   });
 });
 
