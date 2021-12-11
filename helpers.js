@@ -1,6 +1,5 @@
 ////---- HELPER FUNCTIONS ----////
 
-
 ////---- GENERATE RANDOM STRING ----////
 const generateRandomString = function () {
   return Math.random()
@@ -10,7 +9,7 @@ const generateRandomString = function () {
 };
 
 ////---- FIND USER BY EMAIL ----////
-const findUserByEmail = (users, email) => {
+const findUserByEmail = (email, users) => {
   for (const userID in users) {
     const user = users[userID];
     if (user.email === email) {
@@ -21,11 +20,11 @@ const findUserByEmail = (users, email) => {
 };
 
 // -------URLS FOR USER FUNCTION-------
-const urlsForUser = (urlDatabase, userID) => { // should this be userID instead of id?
+const urlsForUser = (urlDatabase, userID) => {
   let filteredList = {};
   for (const shortURL in urlDatabase) {
     if (urlDatabase[shortURL].userID === userID) {
-      filteredList[shortURL] = urlDatabase[shortURL].longURL; // added .longURL because we only want to access the longURL key, *not* the longURL *and* the userID
+      filteredList[shortURL] = urlDatabase[shortURL].longURL;
     }
   }
   return filteredList;
@@ -35,5 +34,5 @@ const urlsForUser = (urlDatabase, userID) => { // should this be userID instead 
 module.exports = {
   generateRandomString,
   findUserByEmail,
-  urlsForUser,
+  urlsForUser
 };
