@@ -110,8 +110,7 @@ app.post("/register", (req, res) => {
     email: email,
     password: hashedPassword,
   };
-  console.log('test ', users);
-  req.session.user_id = id; // why is VSC requesting camelcase for '.user_id'? Not seen this before.
+  req.session.user_id = id;
   res.redirect("/urls");
 });
 ////---- NEW USER REGISTRATION HANDLER END ----////
@@ -119,6 +118,11 @@ app.post("/register", (req, res) => {
 ////---- MAIN TINY APP PAGE START ----////
 app.get("/urls", (req, res) => {
   const userID = req.session["user_id"];
+  const userURLS = urlsForUser(urlDatabase, userID);
+  const templateVars = {
+    urls: userURLS,
+    user: users[req.session["user_id"]],
+  };
   if (!userID) {
     res
       .status(401)
@@ -127,26 +131,7 @@ app.get("/urls", (req, res) => {
       );
     return;
   }
-  const userURLS = urlsForUser(urlDatabase, userID);
-  const templateVars = {
-    urls: userURLS,
-    user: users[req.session["user_id"]],
-  };
   res.render("urls_index", templateVars);
-});
-
-////---- ADDING NEW URLS START ----////
-app.get("/urls/new", (req, res) => {
-  const userID = req.session["user_id"];
-  if (!userID) {
-    res.redirect("/login");
-  }
-
-  const templateVars = {
-    user: users[req.session["user_id"]],
-    userID,
-  };
-  res.render("urls_new", templateVars);
 });
 
 app.post("/urls", (req, res) => {
@@ -167,14 +152,29 @@ app.post("/urls", (req, res) => {
   };
   res.redirect(`/urls/${shortURL}`);
 });
+////---- MAIN TINY APP PAGE END ----////
+
+////---- ADDING NEW URLS START ----////
+app.get("/urls/new", (req, res) => {
+  const userID = req.session["user_id"];
+  if (!userID) {
+    res.redirect("/login");
+  }
+
+  const templateVars = {
+    user: users[req.session["user_id"]],
+    userID,
+  };
+  res.render("urls_new", templateVars);
+});
 ////---- ADDING NEW URLS END----////
 
+////---- EDITING URLS START ----////
 app.get("/u/:shortURL", (req, res) => {
   const longURL = urlDatabase[req.params.shortURL].longURL;
   res.redirect(longURL);
 });
 
-////---- EDITING URLS START ----////
 app.get("/urls/:shortURL", (req, res) => {
   const userID = req.session["user_id"];
   const urlRecord = urlDatabase[req.params.shortURL];
@@ -249,9 +249,7 @@ app.get("/login", (req, res) => {
 app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
-  console.log('login test for users object ', users);
   const user = findUserByEmail(email, users);
-  console.log('test for user ', user);
 
   if (!email || !password) {
     return res
@@ -283,8 +281,6 @@ app.post("/login", (req, res) => {
 ////---- USER LOGOUT START ----////
 app.post("/logout", (req, res) => {
   req.session.user_id = null;
-  //delete req.session.email; // this is another way to use, after implementing encryption
-  console.log('test 2 ', users);
   res.redirect("/urls");
 });
 ////---- USER LOGOUT END ----////

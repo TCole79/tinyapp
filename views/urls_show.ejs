@@ -22,8 +22,10 @@
         </p>
       </div>
       <div class="card-footer text-muted">
+        <h2>Edit</h2>
         <form method="POST" action="/urls/<%= shortURL %>">
-          <input name='EditField' type='text'/>
+          <label for="newURL">New URL:</label>
+          <input name='EditField' type='text' placeholder="http://" />
           <button type="submit" class="btn btn-primary">Submit</button>
         </form>
       </div>
